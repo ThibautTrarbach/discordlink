@@ -24,7 +24,7 @@
     "url": "git://github.com/trmaud/discordlink.git"
   },
   "optionalDependencies": {
-    "bufferutil": "^4.0.3",
+    "bufferutil": "^4.0.4",
     "utf-8-validate": "^5.0.4"
   }
 }
