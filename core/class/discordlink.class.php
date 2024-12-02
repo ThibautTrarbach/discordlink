@@ -77,7 +77,7 @@ class discordlink extends eqLogic {
 		discordlink::setchannel();
 	}
 
-	public function emojyconvert($_text): string
+	public static function emojyconvert($_text): string
 	{
 		$_returntext = '';
 		$textsplit = explode(" ", $_text);
@@ -93,7 +93,7 @@ class discordlink extends eqLogic {
 		return $_returntext;
 	}
 
-	public function checkall() {
+	public static function checkall() {
 		$dateRun = new DateTime();
 		$_options = array('cron'=>true);
 		$eqLogics = eqLogic::byType('discordlink');
@@ -212,8 +212,9 @@ class discordlink extends eqLogic {
 			if (!$result) return "null";
 			$result = substr($result, 1, -1);
 			$json = json_decode($result, true);
-			log::add('discordlink', 'debug', 'Invite = '.$json['invite']);
-			return $json['invite'];
+			$invite = $json['invite'] ?? "null";
+			log::add('discordlink', 'debug', 'Invite = '.$invite);
+			return $invite;
 		}
 	}
 
@@ -847,6 +848,7 @@ class discordlinkCmd extends cmd {
 			$eqLogics = eqLogic::all(true);
 			$cmd = $this->getEqLogic()->getCmd('action', 'sendEmbed');
 
+			$list_battery = '';
 			foreach($eqLogics as $eqLogic)
 			{
 				$nb_total = $nb_total + 1;

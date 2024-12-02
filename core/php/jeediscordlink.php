@@ -125,9 +125,9 @@ function updatecommande($nom, $_value, $_logicalId, $_discordlinkeqlogic, $_upda
 			}	
 		}
 	} catch (Exception $e) {
-		log::add('discordlink', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur_1: '.$e);		
+		log::add('discordlink', 'info',  ' ['.$nom.'] erreur_1: '.$e);		
 	} catch (Error $e) {
-		log::add('discordlink', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur_2: '.$e);
+		log::add('discordlink', 'info',  ' ['.$nom.'] erreur_2: '.$e);
     }	
 }
 
