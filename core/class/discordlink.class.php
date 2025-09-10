@@ -609,8 +609,8 @@ class discordlinkCmd extends cmd {
 			$request = $this->getConfiguration('request');
 			if ((isset($_options['message'])) && ($_options['message'] == "")) $_options['message'] = $default;
 			if (!(isset($_options['message']))) $_options['message'] = "";
-			$request = str_replace(array('#message#'),
-			array(urlencode(self::decodeTexteAleatoire($_options['message']))), $request);
+			$_options['message']=str_replace("|","\n",$_options['message']);
+			$request = str_replace(array('#message#'), array(urlencode(self::decodeTexteAleatoire($_options['message']))), $request);
 			log::add('discordlink_node', 'info', '---->RequestFinale:'.$request);
 			return $request;
 		}
