@@ -376,7 +376,7 @@ class discordlink extends eqLogic {
 			$TabCmd = array(
 				'sendMsg'=>array('reqplug' => '0', 'Libelle'=>'Envoi message', 'Type'=>'action', 'SubType' => 'message','request'=> 'sendMsg?message=#message#', 'visible' => 1, 'Template' => 'discordlink::message'),
 				'sendMsgTTS'=>array('reqplug' => '0','Libelle'=>'Envoi message TTS', 'Type'=>'action', 'SubType' => 'message', 'request'=> 'sendMsgTTS?message=#message#', 'visible' => 1, 'Template' => 'discordlink::message'),
-				'sendEmbed'=>array('reqplug' => '0','Libelle'=>'Envoi message évolué', 'Type'=>'action', 'SubType' => 'message', 'request'=> 'sendEmbed?color=#color#&title=#title#&url=#url#&description=#description#&field=#field#&countanswer=#countanswer#&footer=#footer#&timeout=#timeout#', 'visible' => 0),
+				'sendEmbed'=>array('reqplug' => '0','Libelle'=>'Envoi message évolué', 'Type'=>'action', 'SubType' => 'message', 'request'=> 'sendEmbed?color=#color#&title=#title#&url=#url#&description=#description#&field=#field#&countanswer=#countanswer#&footer=#footer#&timeout=#timeout#&quickreply=#quickreply#', 'visible' => 0),
 				'sendFile'=>array('reqplug' => '0','Libelle'=>'Envoi fichier', 'Type'=>'action', 'SubType' => 'message', 'request'=> 'sendFile?patch=#patch#&name=#name#&message=#message#', 'visible' => 0),
 				'deleteMessage'=>array('reqplug' => '0','Libelle'=>'Supprime les messages du channel', 'Type'=>'action', 'SubType'=>'other','request'=>'deleteMessage?null', 'visible' => 0),
 				'deamonInfo'=>array('reqplug' => '0','Libelle'=>'Etat des démons', 'Type'=>'action', 'SubType'=>'other','request'=>'deamonInfo?null', 'visible' => 1),
@@ -664,6 +664,7 @@ class discordlinkCmd extends cmd {
 			$colors = "null";
 			$timeout = "null";
 			$countanswer = "null";
+			$quickreply = "null";
 
 			if (isset($_options['answer'])) {
 				if (("" != ($_options['title']))) $titre = $_options['title'];
@@ -700,6 +701,7 @@ class discordlinkCmd extends cmd {
 				if (isset($_options['footer'])) if (("" != ($_options['footer']))) $footer = $_options['footer'];
 				if (isset($_options['colors'])) if (("" != ($_options['colors']))) $colors = $_options['colors'];
 				if (isset($_options['field'])) if (("" != ($_options['field']))) $field = json_encode($_options['field']);
+				if (isset($_options['quickreply'])) if (("" != ($_options['quickreply']))) $quickreply = $_options['quickreply'];
 			}
 
 			$description = discordlink::emojyconvert($description);
@@ -721,6 +723,8 @@ class discordlinkCmd extends cmd {
 			array(urlencode(self::decodeTexteAleatoire($colors))), $request);
 			$request = str_replace(array('#timeout#'),
 			array(urlencode(self::decodeTexteAleatoire($timeout))), $request);
+			$request = str_replace(array('#quickreply#'),
+			array(urlencode(self::decodeTexteAleatoire($quickreply))), $request);
 
 			log::add('discordlink_node', 'info', '---->RequestFinale:'.$request);
 			return $request;

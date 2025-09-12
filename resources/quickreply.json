@@ -1,0 +1,10 @@
+{
+    "hello": {
+        "emoji": "👋",
+        "text": "Bonjour à toi !"
+    },
+    "bye": {
+        "emoji": "👋",
+        "text": "Au revoir !"
+    }
+}

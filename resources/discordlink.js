@@ -2,7 +2,7 @@
 //Test : node discordlink.js http://192.168.1.200 NjkzNDU5ODg2NTY2Mjc3MTUw.Xn9Y2A.ldbfL6uAUwGxF-wdU7YOsNkg6ew 100 http://127.0.0.1:80/plugins/discordlink/core/api/jeeDiscordlink.php?apikey=kZxOHfEX aelfgZZWEJaDFnlkhH2wO2pi kZxOHfEXaelfgZZWEJaDFnlkhH2wO2pi Me%20pr%C3%A9pare%20%C3%A0%20faire%20r%C3%A9gner%20la%20terreur
 
 const express = require('express');
-require('fs');
+const fs = require('fs');
 const Discord = require("discord.js");
 
 const client = new Discord.Client();
@@ -21,6 +21,14 @@ const config = {
     token: token,
     listeningPort: 3466
 };
+
+let quickreplyConf = {};
+try {
+    quickreplyConf = JSON.parse(fs.readFileSync(__dirname + '/quickreply.json', 'utf8'));
+    //console.log('quickreply loaded:', quickreplyConf);
+} catch (e) {
+    console.log("Erreur chargement quickreply.json", e);
+}
 
 let dernierStartServeur = 0;
 
@@ -175,6 +183,15 @@ app.get('/sendEmbed', (req, res) => {
     let footer = req.query.footer;
     let reponse = "null";
 
+    // Ajout QuickReply
+    let quickreply = req.query.quickreply;
+    let quickEmoji = null;
+    let quickText = null;
+    if (quickreply && quickreplyConf[quickreply]) {
+        quickEmoji = quickreplyConf[quickreply].emoji;
+        quickText = quickreplyConf[quickreply].text;
+    }
+
     if (color === "null") color = "#ff0000";
 
     const Embed = new Discord.MessageEmbed()
@@ -202,6 +219,33 @@ app.get('/sendEmbed', (req, res) => {
     }
 
     client.channels.cache.get(req.query.channelID).send(Embed).then(async m => {
+
+        // Ajout de l'emoji quickreply si demandé
+        if (quickEmoji) {
+            await m.react(quickEmoji);
+
+            // Création du collector pour l'emoji quickreply
+            const filter = (reaction, user) => reaction.emoji.name === quickEmoji && !user.bot;
+            const collector = m.createReactionCollector(filter, { max: 1, time: 120000 }); // 120 sec pour réagir
+
+            collector.on('collect', (reaction, user) => {
+                m.channel.send(quickText);
+            });
+
+            collector.on('end', (collected, reason) => {
+                if (reason === 'time') {
+                    // Supprimer uniquement la réaction quickreply
+                    const reaction = m.reactions.cache.get(quickEmoji);
+                    if (reaction) {
+                        reaction.remove().catch(() => {});
+                    }
+                    m.channel.send("⏰ Temps écoulé pour répondre !").then(msg => {
+                        setTimeout(() => msg.delete().catch(() => {}), 5000); // Effacement auto après 5 secondes
+                    });
+                }
+            });
+        }
+
         if (countanswer !== "null") {
             let timecalcul = (req.query.timeout * 1000);
             toReturn.push({
