@@ -705,7 +705,7 @@ class discordlinkCmd extends cmd {
 			}
 
 			$description = discordlink::emojyconvert($description);
-			log::add('discordlink', 'debug', 'desctription : '.$description);
+			log::add('discordlink', 'debug', 'description : '.$description);
 
 			$request = str_replace(array('#title#'),
 			array(urlencode(self::decodeTexteAleatoire($titre))), $request);
