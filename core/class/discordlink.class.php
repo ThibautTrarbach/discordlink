@@ -445,6 +445,7 @@ class discordlink extends eqLogic {
     }
 
     public function postUpdate() {
+		discordlink::CreateCmd();
     }
 
     public function preRemove() {
