@@ -175,7 +175,7 @@ class discordlink extends eqLogic {
 			  $clearchannel = $eqLogic->getConfiguration('clearchannel',0);
 			  if ($clearchannel ==1) {
 			  	$cmd = $eqLogic->getCmd("action","deleteMessage");
-				$cmd->execCmd();
+				if (is_object($eqLogic)) $cmd->execCmd();
 			  }
 		  }
       }
@@ -589,7 +589,7 @@ class discordlinkCmd extends cmd {
 					$request = $this->build_CovidSend($_options);
 					break;
 				case 'deleteMessage':
-					$request = $this->build_deleteMessage($_options);
+					$request = 'clearChannel?'; 
 					break;
 				default:
 					$request = '';
@@ -1085,13 +1085,6 @@ class discordlinkCmd extends cmd {
 
 			$cmd = $this->getEqLogic()->getCmd('action', 'sendEmbed');
 			$_options = array('Titre'=>"Votre attestation Covid", 'description'=> $message, 'colors'=> '#ff00ff', 'footer'=> 'By Noodom & Thibaut', 'field'=> $fields);
-			$cmd->execCmd($_options);
-			return 'truesendwithembed';
-		}
-
-		public function build_deleteMessage($_options = array()) {
-			$cmd = $this->getEqLogic()->getCmd('action', 'sendMsg');
-			$_options = array('message'=>'!clearmessagechannel');
 			$cmd->execCmd($_options);
 			return 'truesendwithembed';
 		}

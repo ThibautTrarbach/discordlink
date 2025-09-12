@@ -338,6 +338,21 @@ app.get('/sendEmbed', (req, res) => {
     }
 });
 
+app.get('/clearChannel', async (req, res) => {
+    const channelID = req.query.channelID;
+    if (!channelID) {
+        return res.status(400).json({ error: "channelID manquant" });
+    }
+    const channel = client.channels.cache.get(channelID);
+    if (!channel) {
+        return res.status(404).json({ error: "Channel non trouvé" });
+    }
+    // On crée un faux message minimal pour réutiliser deletemessagechannel
+    const fakeMessage = { channel: channel };
+    await deletemessagechannel(fakeMessage);
+    res.status(200).json({ status: "ok", channelID });
+});
+
 async function deletemessagechannel(message) {
     let date = new Date();
     let timestamp = date.getTime();
@@ -405,11 +420,6 @@ client.on("ready", async () => {
 client.on('message', (receivedMessage) => {
 
 
-    if (receivedMessage.content === "!clearmessagechannel") {
-        deletemessagechannel(receivedMessage);
-        receivedMessage.delete();
-        return;
-    }
     if (receivedMessage.author === client.user) return;
     if (receivedMessage.author.bot) return;
 
