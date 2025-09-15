@@ -239,9 +239,10 @@ app.get('/sendEmbed', (req, res) => {
                     if (reaction) {
                         reaction.remove().catch(() => {});
                     }
-                    m.channel.send("⏰ Temps écoulé pour répondre !").then(msg => {
-                        setTimeout(() => msg.delete().catch(() => {}), 5000); // Effacement auto après 5 secondes
-                    });
+                    // display a message in the channel to indicate time is up (optional)
+                    // m.channel.send("⏰ Temps écoulé pour répondre !").then(msg => {
+                    //     setTimeout(() => msg.delete().catch(() => {}), 5000); 
+                    // });
                 }
             });
         }
