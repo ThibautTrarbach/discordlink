@@ -181,6 +181,7 @@ app.get('/sendEmbed', (req, res) => {
     let countanswer = req.query.countanswer;
     let fields = req.query.field;
     let footer = req.query.footer;
+    let defaultColor = req.query.defaultColor;
     let reponse = "null";
 
     // Ajout QuickReply
@@ -192,7 +193,7 @@ app.get('/sendEmbed', (req, res) => {
         quickText = quickreplyConf[quickreply].text;
     }
 
-    if (color === "null") color = "#ff0000";
+    if (color == '' || color === "null") color = defaultColor;
 
     const Embed = new Discord.MessageEmbed()
         .setColor(color)

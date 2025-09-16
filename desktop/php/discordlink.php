@@ -217,6 +217,17 @@ $eqLogics = eqLogic::byType($plugin->getId());
                                     <input type="number" class="eqLogicAttr form-control roundedLeft roundedRight" data-l1key="configuration" data-l2key="TempMax" placeholder="{{default : 43200}}" />
                                 </div>
                             </div>
+                            <div class="form-group customColor">
+                                <label class="col-sm-3 control-label">
+                                    {{Couleur par défaut}}
+                                    <sup>
+                                        <i class="fas fa-question-circle floatright" style="color: var(--al-info-color) !important;" title="{{Couleur que prendra un message enrichi par défaut}}"></i>
+                                    </sup>
+                                </label>
+                                <div class="col-sm-7">
+                                    <input type="color" class="eqLogicAttr form-control input-sm cursor" data-l1key="configuration" data-l2key="defaultColor" data-type="background-color" style="width: 80px; display: inline-block;">
+                                </div>
+                            </div>
                         </div>
                         <!-- Partie droite de l'onglet "Équipement" -->
                         <!-- Affiche l'icône du plugin par défaut mais vous pouvez y afficher les informations de votre choix -->
