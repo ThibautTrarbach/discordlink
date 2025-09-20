@@ -191,6 +191,7 @@ app.get('/sendEmbed', (req, res) => {
     if (quickreply && quickreplyConf[quickreply]) {
         quickEmoji = quickreplyConf[quickreply].emoji;
         quickText = quickreplyConf[quickreply].text;
+        quickTimeout = quickreplyConf[quickreply].timeout || 120; // valeur par défaut 120 secondes
     }
 
     if (color == '' || color === "null") color = defaultColor;
@@ -227,7 +228,10 @@ app.get('/sendEmbed', (req, res) => {
 
             // Création du collector pour l'emoji quickreply
             const filter = (reaction, user) => reaction.emoji.name === quickEmoji && !user.bot;
-            const collector = m.createReactionCollector(filter, { max: 1, time: 120000 }); // 120 sec pour réagir
+            if (!quickTimeout || isNaN(quickTimeout) || quickTimeout <= 0) {
+                quickTimeout = 120; // valeur par défaut 120 secondes
+            }
+            const collector = m.createReactionCollector(filter, { max: 1, time: quickTimeout *1000 }); 
 
             collector.on('collect', (reaction, user) => {
                 m.channel.send(quickText);

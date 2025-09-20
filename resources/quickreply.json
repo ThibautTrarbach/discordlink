@@ -1,7 +1,8 @@
 {
     "hello": {
         "emoji": "👋",
-        "text": "Bonjour à toi !"
+        "text": "Bonjour à toi !",
+        "timeout": 60
     },
     "bye": {
         "emoji": "👋",
