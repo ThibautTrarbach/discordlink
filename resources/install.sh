@@ -7,7 +7,7 @@ PLUGIN=$(basename "$(realpath $BASEDIR/..)")
 ##################################################################
 wget https://raw.githubusercontent.com/NebzHB/nodejs_install/main/install_nodejs.sh -O $BASEDIR/install_nodejs.sh &>/dev/null
 
-installVer='16' 	#NodeJS major version to be installed
+installVer='22' 	#NodeJS major version to be installed
 
 pre
 step 0 "Vérifications diverses"
