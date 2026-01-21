@@ -21,7 +21,7 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 class discordlinkCovid
 {
 
-    public function generateCovid ($nom = null, $prenom = null, $date_naissance = null, $lieu_naissance = null, $motif = null, $datesortie = null, $heuresortie = null) {
+    public static function generateCovid ($nom = null, $prenom = null, $date_naissance = null, $lieu_naissance = null, $motif = null, $datesortie = null, $heuresortie = null) {
 
         date_default_timezone_set('Europe/Paris');
         $createdate = date("m/d/Y H:i");

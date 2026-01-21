@@ -1,1 +1,4 @@
 /resources/node_modules/
+
+.vscode
+resources/quickreply.json

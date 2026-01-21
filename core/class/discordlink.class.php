@@ -23,6 +23,8 @@ require_once dirname(__FILE__) . '/../../core/php/discordlink.inc.php';
 class discordlink extends eqLogic {
     /*     * *************************Attributs****************************** */
 
+	const DEFAULT_COLOR = '#ff0000';
+
 	public static function templateWidget() {
 		$return['action']['message']['message'] =    array(
 				'template' => 'message',
@@ -77,7 +79,7 @@ class discordlink extends eqLogic {
 		discordlink::setchannel();
 	}
 
-	public function emojyconvert($_text): string
+	public static function emojyconvert($_text): string
 	{
 		$_returntext = '';
 		$textsplit = explode(" ", $_text);
@@ -93,7 +95,7 @@ class discordlink extends eqLogic {
 		return $_returntext;
 	}
 
-	public function checkall() {
+	public static function checkall() {
 		$dateRun = new DateTime();
 		$_options = array('cron'=>true);
 		$eqLogics = eqLogic::byType('discordlink');
@@ -175,7 +177,7 @@ class discordlink extends eqLogic {
 			  $clearchannel = $eqLogic->getConfiguration('clearchannel',0);
 			  if ($clearchannel ==1) {
 			  	$cmd = $eqLogic->getCmd("action","deleteMessage");
-				$cmd->execCmd();
+				if (is_object($eqLogic)) $cmd->execCmd();
 			  }
 		  }
       }
@@ -212,8 +214,9 @@ class discordlink extends eqLogic {
 			if (!$result) return "null";
 			$result = substr($result, 1, -1);
 			$json = json_decode($result, true);
-			log::add('discordlink', 'debug', 'Invite = '.$json['invite']);
-			return $json['invite'];
+			$invite = $json['invite'] ?? "null";
+			log::add('discordlink', 'debug', 'Invite = '.$invite);
+			return $invite;
 		}
 	}
 
@@ -321,7 +324,8 @@ class discordlink extends eqLogic {
 
 
     public function preInsert() {
-
+		$this->setConfiguration('defaultColor', self::DEFAULT_COLOR);
+		$this->setIsEnable(1);
     }
 
     public function postInsert() {
@@ -375,7 +379,7 @@ class discordlink extends eqLogic {
 			$TabCmd = array(
 				'sendMsg'=>array('reqplug' => '0', 'Libelle'=>'Envoi message', 'Type'=>'action', 'SubType' => 'message','request'=> 'sendMsg?message=#message#', 'visible' => 1, 'Template' => 'discordlink::message'),
 				'sendMsgTTS'=>array('reqplug' => '0','Libelle'=>'Envoi message TTS', 'Type'=>'action', 'SubType' => 'message', 'request'=> 'sendMsgTTS?message=#message#', 'visible' => 1, 'Template' => 'discordlink::message'),
-				'sendEmbed'=>array('reqplug' => '0','Libelle'=>'Envoi message évolué', 'Type'=>'action', 'SubType' => 'message', 'request'=> 'sendEmbed?color=#color#&title=#title#&url=#url#&description=#description#&field=#field#&countanswer=#countanswer#&footer=#footer#&timeout=#timeout#', 'visible' => 0),
+				'sendEmbed'=>array('reqplug' => '0','Libelle'=>'Envoi message évolué', 'Type'=>'action', 'SubType' => 'message', 'request'=> 'sendEmbed?color=#color#&title=#title#&url=#url#&description=#description#&field=#field#&countanswer=#countanswer#&footer=#footer#&timeout=#timeout#&quickreply=#quickreply#&defaultColor=#defaultColor#', 'visible' => 0),
 				'sendFile'=>array('reqplug' => '0','Libelle'=>'Envoi fichier', 'Type'=>'action', 'SubType' => 'message', 'request'=> 'sendFile?patch=#patch#&name=#name#&message=#message#', 'visible' => 0),
 				'deleteMessage'=>array('reqplug' => '0','Libelle'=>'Supprime les messages du channel', 'Type'=>'action', 'SubType'=>'other','request'=>'deleteMessage?null', 'visible' => 0),
 				'deamonInfo'=>array('reqplug' => '0','Libelle'=>'Etat des démons', 'Type'=>'action', 'SubType'=>'other','request'=>'deamonInfo?null', 'visible' => 1),
@@ -434,6 +438,10 @@ class discordlink extends eqLogic {
 		}
 	}
 
+	public function getDefaultColor() {
+		return $this->getConfiguration('defaultColor', self::DEFAULT_COLOR);	
+	}
+
     public function postSave() {
 		discordlink::CreateCmd();
 		discordlink::updateobject();
@@ -444,6 +452,7 @@ class discordlink extends eqLogic {
     }
 
     public function postUpdate() {
+		discordlink::CreateCmd();
     }
 
     public function preRemove() {
@@ -587,7 +596,7 @@ class discordlinkCmd extends cmd {
 					$request = $this->build_CovidSend($_options);
 					break;
 				case 'deleteMessage':
-					$request = $this->build_deleteMessage($_options);
+					$request = 'clearChannel?'; 
 					break;
 				default:
 					$request = '';
@@ -608,8 +617,8 @@ class discordlinkCmd extends cmd {
 			$request = $this->getConfiguration('request');
 			if ((isset($_options['message'])) && ($_options['message'] == "")) $_options['message'] = $default;
 			if (!(isset($_options['message']))) $_options['message'] = "";
-			$request = str_replace(array('#message#'),
-			array(urlencode(self::decodeTexteAleatoire($_options['message']))), $request);
+			$_options['message']=str_replace("|","\n",$_options['message']);
+			$request = str_replace(array('#message#'), array(urlencode(self::decodeTexteAleatoire($_options['message']))), $request);
 			log::add('discordlink_node', 'info', '---->RequestFinale:'.$request);
 			return $request;
 		}
@@ -663,6 +672,8 @@ class discordlinkCmd extends cmd {
 			$colors = "null";
 			$timeout = "null";
 			$countanswer = "null";
+			$quickreply = "null";
+			$defaultColor = $this->getEqLogic()->getDefaultColor();
 
 			if (isset($_options['answer'])) {
 				if (("" != ($_options['title']))) $titre = $_options['title'];
@@ -699,10 +710,13 @@ class discordlinkCmd extends cmd {
 				if (isset($_options['footer'])) if (("" != ($_options['footer']))) $footer = $_options['footer'];
 				if (isset($_options['colors'])) if (("" != ($_options['colors']))) $colors = $_options['colors'];
 				if (isset($_options['field'])) if (("" != ($_options['field']))) $field = json_encode($_options['field']);
+				if (isset($_options['quickreply'])) if (("" != ($_options['quickreply']))) $quickreply = $_options['quickreply'];
 			}
 
 			$description = discordlink::emojyconvert($description);
-			log::add('discordlink', 'debug', 'desctription : '.$description);
+			log::add('discordlink', 'debug', 'description : '.$description);
+
+			$description = str_replace("|","\n",$description);
 
 			$request = str_replace(array('#title#'),
 			array(urlencode(self::decodeTexteAleatoire($titre))), $request);
@@ -718,8 +732,12 @@ class discordlinkCmd extends cmd {
 			array(urlencode(self::decodeTexteAleatoire($field))), $request);
 			$request = str_replace(array('#color#'),
 			array(urlencode(self::decodeTexteAleatoire($colors))), $request);
+			$request = str_replace(array('#defaultColor#'),
+			array(urlencode(self::decodeTexteAleatoire($defaultColor))), $request);
 			$request = str_replace(array('#timeout#'),
 			array(urlencode(self::decodeTexteAleatoire($timeout))), $request);
+			$request = str_replace(array('#quickreply#'),
+			array(urlencode(self::decodeTexteAleatoire($quickreply))), $request);
 
 			log::add('discordlink_node', 'info', '---->RequestFinale:'.$request);
 			return $request;
@@ -847,6 +865,7 @@ class discordlinkCmd extends cmd {
 			$eqLogics = eqLogic::all(true);
 			$cmd = $this->getEqLogic()->getCmd('action', 'sendEmbed');
 
+			$list_battery = '';
 			foreach($eqLogics as $eqLogic)
 			{
 				$nb_total = $nb_total + 1;
@@ -1080,17 +1099,11 @@ class discordlinkCmd extends cmd {
 			return 'truesendwithembed';
 		}
 
-		public function build_deleteMessage($_options = array()) {
-			$cmd = $this->getEqLogic()->getCmd('action', 'sendMsg');
-			$_options = array('message'=>'!clearmessagechannel');
-			$cmd->execCmd($_options);
-			return 'truesendwithembed';
-		}
-
 		public function getWidgetTemplateCode($_version = 'dashboard', $_clean = true, $_widgetName = '') {
 			$data = null;
 			if ($_version != 'scenario') return parent::getWidgetTemplateCode($_version, $_clean, $_widgetName);
-			list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
+			
+			list($command, ) = explode('?', $this->getConfiguration('request'), 2);
 			if ($command == 'sendMsg')
 				$data = getTemplate('core', 'scenario', 'cmd.sendMsg', 'discordlink');
 			if ($command == 'sendMsgTTS')
@@ -1101,6 +1114,17 @@ class discordlinkCmd extends cmd {
 				$data = getTemplate('core', 'scenario', 'cmd.sendFile', 'discordlink');
 			if ($command == 'covidSend')
 				$data = getTemplate('core', 'scenario', 'cmd.covidSend', 'discordlink');
+			
+			$defaultColor = $this->getEqLogic()->getDefaultColor();
+			$replace = [
+				'#defaultColor#'  => $defaultColor,
+				'#defaultTitle#' => '',
+				'#defaultDescription#' => '',
+				'#defaultUrl#' => '',	
+				'#defaultFooter#' => '',	
+			 ] ;
+			$data = str_replace(array_keys($replace), array_values($replace), $data);
+			
 			if (!is_null($data)) {
 				if (version_compare(jeedom::version(),'4.2.0','>=')) {
 					 if(!is_array($data)) return array('template' => $data, 'isCoreWidget' => false);

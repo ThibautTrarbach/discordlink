@@ -26,8 +26,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
     <table id="table_cmd" class="table table-bordered table-condensed ui-sortable">
         <thead>
             <tr class="emojy">
-                <th style="">{{Clé émoji}}</th>
-                <th style="">{{Code émoji}}</th>
+                <th>{{Clé émoji}}</th>
+                <th>{{Code émoji}}</th>
                 <th style="width: 100px;"></th>
             </tr>
         </thead>

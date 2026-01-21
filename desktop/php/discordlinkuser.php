@@ -27,10 +27,10 @@ $eqLogics = eqLogic::byType($plugin->getId());
     <table id="table_cmd" class="table table-bordered table-condensed ui-sortable">
         <thead>
             <tr class="">
-                <th style="">{{Nom}}</th>
-                <th style="">{{Prénom}}</th>
-                <th style="">{{Ville de naissance}}</th>
-                <th style="">{{Date de Naissance}}</th>
+                <th>{{Nom}}</th>
+                <th>{{Prénom}}</th>
+                <th>{{Ville de naissance}}</th>
+                <th>{{Date de Naissance}}</th>
                 <th style="width: 100px;"></th>
             </tr>
         </thead>
